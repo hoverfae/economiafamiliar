@@ -730,27 +730,27 @@
                 
                 // Datos de ejemplo
                 const familyMembers = ref([
-                    { id: 1, name: 'Juan Pérez', role: 'Padre', transactionCount: 5, requestCount: 2 },
-                    { id: 2, name: 'María García', role: 'Madre', transactionCount: 8, requestCount: 1 },
-                    { id: 3, name: 'Carlos Pérez', role: 'Hijo', transactionCount: 3, requestCount: 3 },
-                    { id: 4, name: 'Ana Pérez', role: 'Hija', transactionCount: 2, requestCount: 2 }
+                    { id: 1, name: 'Hover Torres', role: 'Padre', transactionCount: 5, requestCount: 2 },
+                    { id: 2, name: 'Blanca Campoverde', role: 'Madre', transactionCount: 8, requestCount: 1 },
+                    { id: 3, name: 'Dylan Torres', role: 'Hijo', transactionCount: 3, requestCount: 3 },
+                    { id: 4, name: 'Marilyn Torres', role: 'Hija', transactionCount: 2, requestCount: 2 }
                 ]);
                 
                 const transactions = ref([
-                    { id: 1, type: 'income', amount: 2500, description: 'Salario mensual', category: 'Salario', date: '2024-01-15', userId: 1, userName: 'Juan Pérez' },
-                    { id: 2, type: 'expense', amount: 350, description: 'Supermercado', category: 'Alimentación', date: '2024-01-16', userId: 2, userName: 'María García' },
-                    { id: 3, type: 'expense', amount: 120, description: 'Pago de luz', category: 'Servicios', date: '2024-01-17', userId: 1, userName: 'Juan Pérez' },
-                    { id: 4, type: 'income', amount: 500, description: 'Freelance', category: 'Otros', date: '2024-01-18', userId: 2, userName: 'María García' },
-                    { id: 5, type: 'expense', amount: 80, description: 'Transporte', category: 'Transporte', date: '2024-01-19', userId: 3, userName: 'Carlos Pérez' },
-                    { id: 6, type: 'expense', amount: 200, description: 'Libros universitarios', category: 'Educación', date: '2024-01-20', userId: 3, userName: 'Carlos Pérez' },
-                    { id: 7, type: 'expense', amount: 150, description: 'Cine familiar', category: 'Entretenimiento', date: '2024-01-21', userId: 4, userName: 'Ana Pérez' }
+                    { id: 1, type: 'income', amount: 2500, description: 'Salario mensual', category: 'Salario', date: '2024-01-15', userId: 1, userName: 'Hover Torres' },
+                    { id: 2, type: 'expense', amount: 350, description: 'Supermercado', category: 'Alimentación', date: '2024-01-16', userId: 2, userName: 'Blanca Campoverde' },
+                    { id: 3, type: 'expense', amount: 120, description: 'Pago de luz', category: 'Servicios', date: '2024-01-17', userId: 1, userName: 'Hover Torres' },
+                    { id: 4, type: 'income', amount: 500, description: 'Freelance', category: 'Otros', date: '2024-01-18', userId: 2, userName: 'Blanca Campoverde' },
+                    { id: 5, type: 'expense', amount: 80, description: 'Transporte', category: 'Transporte', date: '2024-01-19', userId: 3, userName: 'Dylan Torres' },
+                    { id: 6, type: 'expense', amount: 200, description: 'Libros universitarios', category: 'Educación', date: '2024-01-20', userId: 3, userName: 'Dylan Torres' },
+                    { id: 7, type: 'expense', amount: 150, description: 'Cine familiar', category: 'Entretenimiento', date: '2024-01-21', userId: 4, userName: 'Marilyn Torres' }
                 ]);
                 
                 const requests = ref([
-                    { id: 1, title: 'Compra de laptop', description: 'Necesito una laptop para la universidad', amount: 800, category: 'Educación', status: 'approved', date: '2024-01-10', userId: 3, userName: 'Carlos Pérez', priority: 'high' },
-                    { id: 2, title: 'Pago internet', description: 'Pago mensual del servicio de internet', amount: 45, category: 'Servicios', status: 'approved', date: '2024-01-12', userId: 2, userName: 'María García', priority: 'medium' },
-                    { id: 3, title: 'Zapatos nuevos', description: 'Zapatos para el colegio', amount: 60, category: 'Compra', status: 'pending', date: '2024-01-22', userId: 4, userName: 'Ana Pérez', priority: 'medium' },
-                    { id: 4, title: 'Cena familiar', description: 'Cena en restaurante para celebración', amount: 120, category: 'Alimentación', status: 'pending', date: '2024-01-23', userId: 1, userName: 'Juan Pérez', priority: 'low' }
+                    { id: 1, title: 'Compra de laptop', description: 'Necesito una laptop para la universidad', amount: 800, category: 'Educación', status: 'approved', date: '2024-01-10', userId: 3, userName: 'Dylan Torres', priority: 'high' },
+                    { id: 2, title: 'Pago internet', description: 'Pago mensual del servicio de internet', amount: 45, category: 'Servicios', status: 'approved', date: '2024-01-12', userId: 2, userName: 'Blanca Campoverde', priority: 'medium' },
+                    { id: 3, title: 'Zapatos nuevos', description: 'Zapatos para el colegio', amount: 60, category: 'Compra', status: 'pending', date: '2024-01-22', userId: 4, userName: 'Marilyn Torres', priority: 'medium' },
+                    { id: 4, title: 'Cena familiar', description: 'Cena en restaurante para celebración', amount: 120, category: 'Alimentación', status: 'pending', date: '2024-01-23', userId: 1, userName: 'Hover Torres', priority: 'low' }
                 ]);
                 
                 // Nueva transacción
@@ -837,10 +837,10 @@
                     }
                     
                     const users = {
-                        'padre': { id: 1, name: 'Juan Pérez', role: 'admin' },
-                        'madre': { id: 2, name: 'María García', role: 'admin' },
-                        'hijo': { id: 3, name: 'Carlos Pérez', role: 'member' },
-                        'hija': { id: 4, name: 'Ana Pérez', role: 'member' }
+                        'padre': { id: 1, name: 'Hover Torres', role: 'admin' },
+                        'madre': { id: 2, name: 'Blanca Campoverde', role: 'admin' },
+                        'hijo': { id: 3, name: 'Dylan Torres', role: 'member' },
+                        'hija': { id: 4, name: 'Marilyn Torres', role: 'member' }
                     };
                     
                     currentUser.value = users[loginData.value.user];
@@ -1068,4 +1068,5 @@
         }).mount('#app');
     </script>
 </body>
+
 </html>
