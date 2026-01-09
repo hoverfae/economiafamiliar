@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Financiero Familiar</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            min-height: calc(100vh - 56px);
+            padding: 0;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .income {
+            color: var(--success-color);
+        }
+        
+        .expense {
+            color: var(--danger-color);
+        }
+        
+        .balance {
+            color: var(--secondary-color);
+        }
+        
+        .transaction-item {
+            border-left: 4px solid;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        
+        .transaction-income {
+            border-left-color: var(--success-color);
+        }
+        
+        .transaction-expense {
+            border-left-color: var(--danger-color);
+        }
+        
+        .request-pending {
+            border-left-color: var(--warning-color);
+        }
+        
+        .request-approved {
+            border-left-color: var(--success-color);
+        }
+        
+        .request-rejected {
+            border-left-color: var(--danger-color);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenedor principal -->
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="login-screen" class="container" v-if="!isLoggedIn">
+            <div class="login-container">
+                <div class="login-logo">
+                    <i class="fas fa-home fa-3x mb-3"></i>
+                    <h2>Control Financiero Familiar</h2>
+                    <p class="text-muted">Gestiona los ingresos y egresos de tu hogar</p>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="login-user" class="form-label">Usuario</label>
+                    <select id="login-user" class="form-select" v-model="loginData.user">
+                        <option value="">Seleccionar usuario</option>
+                        <option value="padre">Padre (Hover Torres)</option>
+                        <option value="madre">Madre (Blanca Campoverde)</option>
+                        <option value="hijo">Hijo (Dylan Torres)</option>
+                        <option value="hija">Hija (Marilyn Torres)</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">Contraseña</label>
+                    <input type="password" id="login-password" class="form-control" v-model="loginData.password" placeholder="Ingresa tu contraseña">
+                    <small class="text-muted">Solicita la contraseña a "hoverfae@gmail.com"</small>
+                </div>
+                
+                <button class="btn btn-primary w-100" @click="login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                
+                <div class="mt-3 text-center">
+                    <p class="text-muted">Demo: solo para uso demostrativo</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main App -->
+        <div v-if="isLoggedIn">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-color);">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">
+                        <i class="fas fa-home"></i> Control Familiar
+                    </a>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 text-white">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ currentUser.name }}
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" @click="logout">
+                            <i class="fas fa-sign-out-alt"></i> Salir
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Sidebar -->
+                    <div class="col-md-3 col-lg-2 sidebar">
+                        <div class="position-sticky pt-3">
+                            <ul class="nav flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#" @click="setActiveView('dashboard')">
+                                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" @click="setActiveView('transactions')">
+                                        <i class="fas fa-exchange-alt me-2"></i> Transacciones
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" @click="setActiveView('requests')">
+                                        <i class="fas fa-clipboard-list me-2"></i> Solicitudes
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" @click="setActiveView('new-transaction')">
+                                        <i class="fas fa-plus-circle me-2"></i> Nueva Transacción
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" @click="setActiveView('new-request')">
+                                        <i class="fas fa-hand-holding-usd me-2"></i> Nueva Solicitud
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#" @click="setActiveView('family')">
+                                        <i class="fas fa-users me-2"></i> Miembros Familia
+                                    </a>
+                                </li>
+                            </ul>
+                            
+                            <div class="mt-5 p-3" style="background-color: rgba(255,255,255,0.1); border-radius: 5px;">
+                                <h6 class="text-white">Resumen Mensual</h6>
+                                <p class="mb-1">Ingresos: <span class="text-success">${{ monthlySummary.income.toLocaleString() }}</span></p>
+                                <p class="mb-1">Egresos: <span class="text-danger">${{ monthlySummary.expense.toLocaleString() }}</span></p>
+                                <p class="mb-0">Balance: <span :class="monthlySummary.balance >= 0 ? 'text-success' : 'text-danger'">
+                                    ${{ monthlySummary.balance.toLocaleString() }}
+                                </span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="col-md-9 col-lg-10 ms-sm-auto px-4 py-4">
+                        <!-- Dashboard View -->
+                        <div v-if="activeView === 'dashboard'">
+                            <h2 class="mb-4">Dashboard Financiero</h2>
+                            
+                            <div class="row">
+                                <!-- Stats Cards -->
+                                <div class="col-md-4">
+                                    <div class="card stat-card">
+                                        <div class="card-body">
+                                            <i class="fas fa-arrow-down fa-2x income"></i>
+                                            <div class="stat-number income">${{ totalIncome.toLocaleString() }}</div>
+                                            <p class="text-muted">Total Ingresos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="card stat-card">
+                                        <div class="card-body">
+                                            <i class="fas fa-arrow-up fa-2x expense"></i>
+                                            <div class="stat-number expense">${{ totalExpense.toLocaleString() }}</div>
+                                            <p class="text-muted">Total Egresos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="card stat-card">
+                                        <div class="card-body">
+                                            <i class="fas fa-balance-scale fa-2x balance"></i>
+                                            <div class="stat-number balance" :class="totalBalance >= 0 ? 'balance' : 'expense'">
+                                                ${{ totalBalance.toLocaleString() }}
+                                            </div>
+                                            <p class="text-muted">Balance General</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Recent Transactions -->
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fas fa-history me-2"></i> Transacciones Recientes
+                                        </div>
+                                        <div class="card-body">
+                                            <div v-if="recentTransactions.length === 0" class="text-center text-muted py-4">
+                                                No hay transacciones registradas
+                                            </div>
+                                            
+                                            <div v-for="transaction in recentTransactions" :key="transaction.id" 
+                                                 class="transaction-item" 
+                                                 :class="transaction.type === 'income' ? 'transaction-income' : 'transaction-expense'">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1">{{ transaction.description }}</h6>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-user me-1"></i>{{ transaction.userName }} • 
+                                                            <i class="fas fa-calendar me-1"></i>{{ transaction.date }}
+                                                        </small>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-bold" :class="transaction.type === 'income' ? 'text-success' : 'text-danger'">
+                                                            {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toLocaleString() }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Pending Requests -->
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fas fa-clock me-2"></i> Solicitudes Pendientes
+                                        </div>
+                                        <div class="card-body">
+                                            <div v-if="pendingRequests.length === 0" class="text-center text-muted py-4">
+                                                No hay solicitudes pendientes
+                                            </div>
+                                            
+                                            <div v-for="request in pendingRequests" :key="request.id" 
+                                                 class="transaction-item request-pending">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1">{{ request.title }}</h6>
+                                                        <p class="mb-1">{{ request.description }}</p>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-user me-1"></i>{{ request.userName }} • 
+                                                            <i class="fas fa-calendar me-1"></i>{{ request.date }} •
+                                                            <span class="badge bg-warning">{{ request.category }}</span>
+                                                        </small>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-bold text-warning">${{ request.amount.toLocaleString() }}</span>
+                                                        <div class="mt-2">
+                                                            <button class="btn btn-success btn-sm me-1" @click="approveRequest(request.id)" v-if="currentUser.role === 'admin'">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                            <button class="btn btn-danger btn-sm" @click="rejectRequest(request.id)" v-if="currentUser.role === 'admin'">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Transactions View -->
+                        <div v-if="activeView === 'transactions'">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h2>Transacciones</h2>
+                                <button class="btn btn-primary" @click="setActiveView('new-transaction')">
+                                    <i class="fas fa-plus me-1"></i> Nueva Transacción
+                                </button>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-list me-2"></i> Todas las Transacciones</span>
+                                    <div>
+                                        <select class="form-select form-select-sm" v-model="transactionFilter" style="width: auto;">
+                                            <option value="all">Todas</option>
+                                            <option value="income">Ingresos</option>
+                                            <option value="expense">Egresos</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Descripción</th>
+                                                <th>Categoría</th>
+                                                <th>Usuario</th>
+                                                <th class="text-end">Monto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="transaction in filteredTransactions" :key="transaction.id">
+                                                <td>{{ transaction.date }}</td>
+                                                <td>{{ transaction.description }}</td>
+                                                <td>
+                                                    <span class="badge" :class="getCategoryClass(transaction.category)">
+                                                        {{ transaction.category }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="user-avatar me-2">
+                                                            {{ getUserInitials(transaction.userName) }}
+                                                        </div>
+                                                        {{ transaction.userName }}
+                                                    </div>
+                                                </td>
+                                                <td class="text-end" :class="transaction.type === 'income' ? 'text-success' : 'text-danger'">
+                                                    {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toLocaleString() }}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Requests View -->
+                        <div v-if="activeView === 'requests'">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h2>Solicitudes</h2>
+                                <button class="btn btn-primary" @click="setActiveView('new-request')">
+                                    <i class="fas fa-plus me-1"></i> Nueva Solicitud
+                                </button>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-clipboard-list me-2"></i> Historial de Solicitudes
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3" v-for="request in allRequests" :key="request.id">
+                                            <div class="card h-100" :class="getRequestStatusClass(request)">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">{{ request.title }}</h5>
+                                                    <p class="card-text">{{ request.description }}</p>
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-user me-1"></i>{{ request.userName }}<br>
+                                                            <i class="fas fa-calendar me-1"></i>{{ request.date }}
+                                                        </small>
+                                                    </p>
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="fw-bold">${{ request.amount.toLocaleString() }}</span>
+                                                        <span class="badge" :class="getRequestStatusBadgeClass(request)">
+                                                            {{ request.status === 'pending' ? 'Pendiente' : 
+                                                               request.status === 'approved' ? 'Aprobado' : 'Rechazado' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- New Transaction View -->
+                        <div v-if="activeView === 'new-transaction'">
+                            <h2 class="mb-4">Nueva Transacción</h2>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-plus-circle me-2"></i> Registrar Transacción
+                                </div>
+                                <div class="card-body">
+                                    <form @submit.prevent="addTransaction">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Tipo de Transacción</label>
+                                                <div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" id="income-type" value="income" v-model="newTransaction.type">
+                                                        <label class="form-check-label" for="income-type">
+                                                            <i class="fas fa-arrow-down text-success me-1"></i> Ingreso
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" id="expense-type" value="expense" v-model="newTransaction.type">
+                                                        <label class="form-check-label" for="expense-type">
+                                                            <i class="fas fa-arrow-up text-danger me-1"></i> Egreso
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6 mb-3">
+                                                <label for="amount" class="form-label">Monto</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" id="amount" v-model="newTransaction.amount" required step="0.01" min="0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Descripción</label>
+                                            <input type="text" class="form-control" id="description" v-model="newTransaction.description" required>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="category" class="form-label">Categoría</label>
+                                                <select class="form-select" id="category" v-model="newTransaction.category" required>
+                                                    <option value="">Seleccionar categoría</option>
+                                                    <option value="Salario">Salario</option>
+                                                    <option value="Alimentación">Alimentación</option>
+                                                    <option value="Transporte">Transporte</option>
+                                                    <option value="Educación">Educación</option>
+                                                    <option value="Salud">Salud</option>
+                                                    <option value="Entretenimiento">Entretenimiento</option>
+                                                    <option value="Servicios">Servicios (Agua/Luz/Internet)</option>
+                                                    <option value="Otros">Otros</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div class="col-md-6 mb-3">
+                                                <label for="date" class="form-label">Fecha</label>
+                                                <input type="date" class="form-control" id="date" v-model="newTransaction.date" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-secondary" @click="setActiveView('dashboard')">
+                                                <i class="fas fa-arrow-left me-1"></i> Cancelar
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-1"></i> Guardar Transacción
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- New Request View -->
+                        <div v-if="activeView === 'new-request'">
+                            <h2 class="mb-4">Nueva Solicitud</h2>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    <i class="fas fa-hand-holding-usd me-2"></i> Crear Solicitud
+                                </div>
+                                <div class="card-body">
+                                    <form @submit.prevent="addRequest">
+                                        <div class="mb-3">
+                                            <label for="request-title" class="form-label">Título</label>
+                                            <input type="text" class="form-control" id="request-title" v-model="newRequest.title" required>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="request-description" class="form-label">Descripción</label>
+                                            <textarea class="form-control" id="request-description" v-model="newRequest.description" rows="3" required></textarea>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="request-amount" class="form-label">Monto Solicitado</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" class="form-control" id="request-amount" v-model="newRequest.amount" required step="0.01" min="0">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6 mb-3">
+                                                <label for="request-category" class="form-label">Categoría</label>
+                                                <select class="form-select" id="request-category" v-model="newRequest.category" required>
+                                                    <option value="">Seleccionar categoría</option>
+                                                    <option value="Compra">Compra de Bienes</option>
+                                                    <option value="Servicio">Pago de Servicios</option>
+                                                    <option value="Emergencia">Emergencia</option>
+                                                    <option value="Educación">Educación</option>
+                                                    <option value="Salud">Salud</option>
+                                                    <option value="Otros">Otros</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="request-priority" class="form-label">Prioridad</label>
+                                            <select class="form-select" id="request-priority" v-model="newRequest.priority" required>
+                                                <option value="low">Baja</option>
+                                                <option value="medium">Media</option>
+                                                <option value="high">Alta</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-secondary" @click="setActiveView('dashboard')">
+                                                <i class="fas fa-arrow-left me-1"></i> Cancelar
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane me-1"></i> Enviar Solicitud
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Family View -->
+                        <div v-if="activeView === 'family'">
+                            <h2 class="mb-4">Miembros de la Familia</h2>
+                            
+                            <div class="row">
+                                <div class="col-md-3 mb-4" v-for="member in familyMembers" :key="member.id">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <div class="user-avatar mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                                {{ getUserInitials(member.name) }}
+                                            </div>
+                                            <h5 class="card-title">{{ member.name }}</h5>
+                                            <p class="card-text text-muted">{{ member.role }}</p>
+                                            <div class="mt-3">
+                                                <p class="mb-1"><small>Transacciones: {{ member.transactionCount }}</small></p>
+                                                <p class="mb-0"><small>Solicitudes: {{ member.requestCount }}</small></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <i class="fas fa-chart-pie me-2"></i> Distribución de Gastos por Miembro
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Miembro</th>
+                                                    <th>Total Ingresos</th>
+                                                    <th>Total Egresos</th>
+                                                    <th>Balance Personal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="member in familyMembers" :key="member.id">
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="user-avatar me-2">
+                                                                {{ getUserInitials(member.name) }}
+                                                            </div>
+                                                            {{ member.name }}
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-success">${{ getMemberIncome(member.id).toLocaleString() }}</td>
+                                                    <td class="text-danger">${{ getMemberExpense(member.id).toLocaleString() }}</td>
+                                                    <td :class="getMemberBalance(member.id) >= 0 ? 'text-success' : 'text-danger'">
+                                                        ${{ getMemberBalance(member.id).toLocaleString() }}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                // Estado de la aplicación
+                const isLoggedIn = ref(false);
+                const activeView = ref('dashboard');
+                const transactionFilter = ref('all');
+                const loginData = ref({
+                    user: '',
+                    password: ''
+                });
+                
+                // Datos del usuario actual
+                const currentUser = ref({
+                    id: '',
+                    name: '',
+                    role: ''
+                });
+                
+                // Datos de ejemplo
+                const familyMembers = ref([
+                    { id: 1, name: 'Juan Pérez', role: 'Padre', transactionCount: 5, requestCount: 2 },
+                    { id: 2, name: 'María García', role: 'Madre', transactionCount: 8, requestCount: 1 },
+                    { id: 3, name: 'Carlos Pérez', role: 'Hijo', transactionCount: 3, requestCount: 3 },
+                    { id: 4, name: 'Ana Pérez', role: 'Hija', transactionCount: 2, requestCount: 2 }
+                ]);
+                
+                const transactions = ref([
+                    { id: 1, type: 'income', amount: 2500, description: 'Salario mensual', category: 'Salario', date: '2024-01-15', userId: 1, userName: 'Juan Pérez' },
+                    { id: 2, type: 'expense', amount: 350, description: 'Supermercado', category: 'Alimentación', date: '2024-01-16', userId: 2, userName: 'María García' },
+                    { id: 3, type: 'expense', amount: 120, description: 'Pago de luz', category: 'Servicios', date: '2024-01-17', userId: 1, userName: 'Juan Pérez' },
+                    { id: 4, type: 'income', amount: 500, description: 'Freelance', category: 'Otros', date: '2024-01-18', userId: 2, userName: 'María García' },
+                    { id: 5, type: 'expense', amount: 80, description: 'Transporte', category: 'Transporte', date: '2024-01-19', userId: 3, userName: 'Carlos Pérez' },
+                    { id: 6, type: 'expense', amount: 200, description: 'Libros universitarios', category: 'Educación', date: '2024-01-20', userId: 3, userName: 'Carlos Pérez' },
+                    { id: 7, type: 'expense', amount: 150, description: 'Cine familiar', category: 'Entretenimiento', date: '2024-01-21', userId: 4, userName: 'Ana Pérez' }
+                ]);
+                
+                const requests = ref([
+                    { id: 1, title: 'Compra de laptop', description: 'Necesito una laptop para la universidad', amount: 800, category: 'Educación', status: 'approved', date: '2024-01-10', userId: 3, userName: 'Carlos Pérez', priority: 'high' },
+                    { id: 2, title: 'Pago internet', description: 'Pago mensual del servicio de internet', amount: 45, category: 'Servicios', status: 'approved', date: '2024-01-12', userId: 2, userName: 'María García', priority: 'medium' },
+                    { id: 3, title: 'Zapatos nuevos', description: 'Zapatos para el colegio', amount: 60, category: 'Compra', status: 'pending', date: '2024-01-22', userId: 4, userName: 'Ana Pérez', priority: 'medium' },
+                    { id: 4, title: 'Cena familiar', description: 'Cena en restaurante para celebración', amount: 120, category: 'Alimentación', status: 'pending', date: '2024-01-23', userId: 1, userName: 'Juan Pérez', priority: 'low' }
+                ]);
+                
+                // Nueva transacción
+                const newTransaction = ref({
+                    type: 'expense',
+                    amount: 0,
+                    description: '',
+                    category: '',
+                    date: new Date().toISOString().split('T')[0]
+                });
+                
+                // Nueva solicitud
+                const newRequest = ref({
+                    title: '',
+                    description: '',
+                    amount: 0,
+                    category: '',
+                    priority: 'medium'
+                });
+                
+                // Computed properties
+                const totalIncome = computed(() => {
+                    return transactions.value
+                        .filter(t => t.type === 'income')
+                        .reduce((sum, t) => sum + t.amount, 0);
+                });
+                
+                const totalExpense = computed(() => {
+                    return transactions.value
+                        .filter(t => t.type === 'expense')
+                        .reduce((sum, t) => sum + t.amount, 0);
+                });
+                
+                const totalBalance = computed(() => totalIncome.value - totalExpense.value);
+                
+                const recentTransactions = computed(() => {
+                    return [...transactions.value]
+                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                        .slice(0, 5);
+                });
+                
+                const pendingRequests = computed(() => {
+                    return requests.value.filter(r => r.status === 'pending');
+                });
+                
+                const allRequests = computed(() => {
+                    return [...requests.value].sort((a, b) => new Date(b.date) - new Date(a.date));
+                });
+                
+                const filteredTransactions = computed(() => {
+                    if (transactionFilter.value === 'all') return transactions.value;
+                    return transactions.value.filter(t => t.type === transactionFilter.value);
+                });
+                
+                const monthlySummary = computed(() => {
+                    const currentMonth = new Date().getMonth();
+                    const currentYear = new Date().getFullYear();
+                    
+                    const monthTransactions = transactions.value.filter(t => {
+                        const date = new Date(t.date);
+                        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                    });
+                    
+                    const income = monthTransactions
+                        .filter(t => t.type === 'income')
+                        .reduce((sum, t) => sum + t.amount, 0);
+                    
+                    const expense = monthTransactions
+                        .filter(t => t.type === 'expense')
+                        .reduce((sum, t) => sum + t.amount, 0);
+                    
+                    return {
+                        income,
+                        expense,
+                        balance: income - expense
+                    };
+                });
+                
+                // Métodos
+                const login = () => {
+                    if (!loginData.value.user || loginData.value.password !== 'familia123') {
+                        alert('Usuario o contraseña incorrectos');
+                        return;
+                    }
+                    
+                    const users = {
+                        'padre': { id: 1, name: 'Juan Pérez', role: 'admin' },
+                        'madre': { id: 2, name: 'María García', role: 'admin' },
+                        'hijo': { id: 3, name: 'Carlos Pérez', role: 'member' },
+                        'hija': { id: 4, name: 'Ana Pérez', role: 'member' }
+                    };
+                    
+                    currentUser.value = users[loginData.value.user];
+                    isLoggedIn.value = true;
+                    activeView.value = 'dashboard';
+                    
+                    loginData.value = { user: '', password: '' };
+                };
+                
+                const logout = () => {
+                    isLoggedIn.value = false;
+                    currentUser.value = { id: '', name: '', role: '' };
+                };
+                
+                const setActiveView = (view) => {
+                    activeView.value = view;
+                };
+                
+                const addTransaction = () => {
+                    const newId = transactions.value.length > 0 
+                        ? Math.max(...transactions.value.map(t => t.id)) + 1 
+                        : 1;
+                    
+                    const transaction = {
+                        id: newId,
+                        type: newTransaction.value.type,
+                        amount: parseFloat(newTransaction.value.amount),
+                        description: newTransaction.value.description,
+                        category: newTransaction.value.category,
+                        date: newTransaction.value.date,
+                        userId: currentUser.value.id,
+                        userName: currentUser.value.name
+                    };
+                    
+                    transactions.value.push(transaction);
+                    
+                    // Actualizar contador del usuario
+                    const member = familyMembers.value.find(m => m.id === currentUser.value.id);
+                    if (member) member.transactionCount++;
+                    
+                    // Reset form
+                    newTransaction.value = {
+                        type: 'expense',
+                        amount: 0,
+                        description: '',
+                        category: '',
+                        date: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    alert('Transacción registrada exitosamente');
+                    setActiveView('transactions');
+                };
+                
+                const addRequest = () => {
+                    const newId = requests.value.length > 0 
+                        ? Math.max(...requests.value.map(r => r.id)) + 1 
+                        : 1;
+                    
+                    const request = {
+                        id: newId,
+                        title: newRequest.value.title,
+                        description: newRequest.value.description,
+                        amount: parseFloat(newRequest.value.amount),
+                        category: newRequest.value.category,
+                        status: 'pending',
+                        date: new Date().toISOString().split('T')[0],
+                        userId: currentUser.value.id,
+                        userName: currentUser.value.name,
+                        priority: newRequest.value.priority
+                    };
+                    
+                    requests.value.push(request);
+                    
+                    // Actualizar contador del usuario
+                    const member = familyMembers.value.find(m => m.id === currentUser.value.id);
+                    if (member) member.requestCount++;
+                    
+                    // Reset form
+                    newRequest.value = {
+                        title: '',
+                        description: '',
+                        amount: 0,
+                        category: '',
+                        priority: 'medium'
+                    };
+                    
+                    alert('Solicitud enviada exitosamente');
+                    setActiveView('requests');
+                };
+                
+                const approveRequest = (requestId) => {
+                    const request = requests.value.find(r => r.id === requestId);
+                    if (request) {
+                        request.status = 'approved';
+                        
+                        // Convertir solicitud aprobada en transacción
+                        const newId = transactions.value.length > 0 
+                            ? Math.max(...transactions.value.map(t => t.id)) + 1 
+                            : 1;
+                        
+                        const transaction = {
+                            id: newId,
+                            type: 'expense',
+                            amount: request.amount,
+                            description: `Aprobado: ${request.title}`,
+                            category: request.category,
+                            date: new Date().toISOString().split('T')[0],
+                            userId: request.userId,
+                            userName: request.userName
+                        };
+                        
+                        transactions.value.push(transaction);
+                        alert('Solicitud aprobada y registrada como transacción');
+                    }
+                };
+                
+                const rejectRequest = (requestId) => {
+                    const request = requests.value.find(r => r.id === requestId);
+                    if (request) {
+                        request.status = 'rejected';
+                        alert('Solicitud rechazada');
+                    }
+                };
+                
+                const getCategoryClass = (category) => {
+                    const classes = {
+                        'Salario': 'bg-success',
+                        'Alimentación': 'bg-warning',
+                        'Transporte': 'bg-info',
+                        'Educación': 'bg-primary',
+                        'Salud': 'bg-danger',
+                        'Entretenimiento': 'bg-secondary',
+                        'Servicios': 'bg-dark',
+                        'Otros': 'bg-light text-dark'
+                    };
+                    return classes[category] || 'bg-light text-dark';
+                };
+                
+                const getRequestStatusClass = (request) => {
+                    if (request.status === 'pending') return 'request-pending';
+                    if (request.status === 'approved') return 'request-approved';
+                    return 'request-rejected';
+                };
+                
+                const getRequestStatusBadgeClass = (request) => {
+                    if (request.status === 'pending') return 'bg-warning';
+                    if (request.status === 'approved') return 'bg-success';
+                    return 'bg-danger';
+                };
+                
+                const getUserInitials = (name) => {
+                    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+                };
+                
+                const getMemberIncome = (memberId) => {
+                    return transactions.value
+                        .filter(t => t.userId === memberId && t.type === 'income')
+                        .reduce((sum, t) => sum + t.amount, 0);
+                };
+                
+                const getMemberExpense = (memberId) => {
+                    return transactions.value
+                        .filter(t => t.userId === memberId && t.type === 'expense')
+                        .reduce((sum, t) => sum + t.amount, 0);
+                };
+                
+                const getMemberBalance = (memberId) => {
+                    return getMemberIncome(memberId) - getMemberExpense(memberId);
+                };
+                
+                // Inicialización
+                onMounted(() => {
+                    // Cargar datos del localStorage si existen
+                    const savedTransactions = localStorage.getItem('familyTransactions');
+                    const savedRequests = localStorage.getItem('familyRequests');
+                    
+                    if (savedTransactions) transactions.value = JSON.parse(savedTransactions);
+                    if (savedRequests) requests.value = JSON.parse(savedRequests);
+                });
+                
+                // Guardar datos en localStorage cuando cambien
+                const saveData = () => {
+                    localStorage.setItem('familyTransactions', JSON.stringify(transactions.value));
+                    localStorage.setItem('familyRequests', JSON.stringify(requests.value));
+                };
+                
+                // Auto-guardar cada minuto
+                setInterval(saveData, 60000);
+                
+                return {
+                    isLoggedIn,
+                    activeView,
+                    transactionFilter,
+                    loginData,
+                    currentUser,
+                    familyMembers,
+                    transactions,
+                    requests,
+                    newTransaction,
+                    newRequest,
+                    totalIncome,
+                    totalExpense,
+                    totalBalance,
+                    recentTransactions,
+                    pendingRequests,
+                    allRequests,
+                    filteredTransactions,
+                    monthlySummary,
+                    login,
+                    logout,
+                    setActiveView,
+                    addTransaction,
+                    addRequest,
+                    approveRequest,
+                    rejectRequest,
+                    getCategoryClass,
+                    getRequestStatusClass,
+                    getRequestStatusBadgeClass,
+                    getUserInitials,
+                    getMemberIncome,
+                    getMemberExpense,
+                    getMemberBalance
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
